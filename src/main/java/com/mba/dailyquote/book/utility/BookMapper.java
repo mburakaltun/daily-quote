@@ -1,6 +1,6 @@
 package com.mba.dailyquote.book.utility;
 
-import com.mba.dailyquote.book.model.dto.BookDTO;
+import com.mba.dailyquote.book.model.dto.BookDto;
 import com.mba.dailyquote.book.model.entity.BookEntity;
 import lombok.experimental.UtilityClass;
 
@@ -10,8 +10,8 @@ import java.util.stream.Collectors;
 @UtilityClass
 public class BookMapper {
 
-    public BookDTO toDto(BookEntity bookEntity) {
-        return BookDTO.builder()
+    public BookDto toDto(BookEntity bookEntity) {
+        return BookDto.builder()
                 .id(bookEntity.getId())
                 .createdDate(bookEntity.getCreatedDate())
                 .updatedDate(bookEntity.getUpdatedDate())
@@ -19,7 +19,7 @@ public class BookMapper {
                 .build();
     }
 
-    public List<BookDTO> toDtoList(List<BookEntity> bookEntityList) {
+    public List<BookDto> toDtoList(List<BookEntity> bookEntityList) {
         return bookEntityList.stream()
                 .map(BookMapper::toDto)
                 .collect(Collectors.toList());

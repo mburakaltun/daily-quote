@@ -1,6 +1,6 @@
 package com.mba.dailyquote.author.model.response;
 
-import com.mba.dailyquote.author.model.dto.AuthorDTO;
+import com.mba.dailyquote.author.model.dto.AuthorDto;
 import com.mba.dailyquote.common.model.response.PageableResponse;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -12,5 +12,5 @@ import java.util.List;
 @Data
 @SuperBuilder
 public class ResponseGetAllAuthors extends PageableResponse {
-    private List<AuthorDTO> authorDTOList;
+    private List<AuthorDto> authorDtoList;
 }

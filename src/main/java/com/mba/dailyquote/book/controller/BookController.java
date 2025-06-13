@@ -9,6 +9,7 @@ import com.mba.dailyquote.book.model.response.ResponseGetBooks;
 import com.mba.dailyquote.book.model.response.ResponseUpdateBook;
 import com.mba.dailyquote.book.service.BookService;
 import com.mba.dailyquote.common.controller.BaseController;
+import com.mba.dailyquote.common.exception.AppException;
 import com.mba.dailyquote.common.model.response.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -38,20 +39,19 @@ public class BookController extends BaseController {
     }
 
     @PutMapping("/{bookId}")
-    public ResponseEntity<ApiResponse<ResponseUpdateBook>> updateBook(@PathVariable("bookId") Long bookId, @Valid @RequestBody RequestUpdateBook requestUpdateBook) {
-        requestUpdateBook.setId(bookId);
-        ResponseUpdateBook response = bookService.updateBook(requestUpdateBook);
+    public ResponseEntity<ApiResponse<ResponseUpdateBook>> updateBook(@PathVariable("bookId") Long bookId, @Valid @RequestBody RequestUpdateBook requestUpdateBook) throws AppException {
+        ResponseUpdateBook response = bookService.updateBook(requestUpdateBook, bookId);
         return new ResponseEntity<>(respond(response), HttpStatus.OK);
     }
 
     @DeleteMapping("/{bookId}")
-    public ResponseEntity<ApiResponse<Void>> deleteBook(@PathVariable("bookId") Long bookId) {
+    public ResponseEntity<ApiResponse<Void>> deleteBook(@PathVariable("bookId") Long bookId) throws AppException {
         bookService.deleteBook(bookId);
         return new ResponseEntity<>(respond(), HttpStatus.OK);
     }
 
     @GetMapping("/{bookId}")
-    public ResponseEntity<ApiResponse<ResponseGetBook>> getBookById(@PathVariable("bookId") Long bookId) {
+    public ResponseEntity<ApiResponse<ResponseGetBook>> getBookById(@PathVariable("bookId") Long bookId) throws AppException {
         ResponseGetBook response = bookService.getBookById(bookId);
         return new ResponseEntity<>(respond(response), HttpStatus.OK);
     }

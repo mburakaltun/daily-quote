@@ -1,7 +1,8 @@
 package com.mba.dailyquote.book.service;
 
-import com.mba.dailyquote.book.model.dto.BookDTO;
+import com.mba.dailyquote.book.model.dto.BookDto;
 import com.mba.dailyquote.book.model.entity.BookEntity;
+import com.mba.dailyquote.book.model.enums.BookErrorCode;
 import com.mba.dailyquote.book.model.request.RequestCreateBook;
 import com.mba.dailyquote.book.model.request.RequestGetAllBooks;
 import com.mba.dailyquote.book.model.request.RequestUpdateBook;
@@ -11,7 +12,7 @@ import com.mba.dailyquote.book.model.response.ResponseGetBooks;
 import com.mba.dailyquote.book.model.response.ResponseUpdateBook;
 import com.mba.dailyquote.book.repository.BookRepository;
 import com.mba.dailyquote.book.utility.BookMapper;
-import jakarta.persistence.EntityNotFoundException;
+import com.mba.dailyquote.common.exception.AppException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +36,8 @@ public class BookService {
                 .build();
     }
 
-    public ResponseUpdateBook updateBook(RequestUpdateBook requestUpdateBook) {
-        Long id = requestUpdateBook.getId();
-        BookEntity bookEntity = findBookById(id);
+    public ResponseUpdateBook updateBook(RequestUpdateBook requestUpdateBook, Long bookId) throws AppException {
+        BookEntity bookEntity = findBookById(bookId);
         bookEntity.setTitle(requestUpdateBook.getTitle());
         bookEntity = bookRepository.save(bookEntity);
         return ResponseUpdateBook.builder()
@@ -45,16 +45,16 @@ public class BookService {
                 .build();
     }
 
-    public void deleteBook(Long bookId) {
+    public void deleteBook(Long bookId) throws AppException {
         BookEntity bookEntity = findBookById(bookId);
         bookRepository.delete(bookEntity);
     }
 
-    public ResponseGetBook getBookById(Long bookId) {
+    public ResponseGetBook getBookById(Long bookId) throws AppException {
         BookEntity bookEntity = findBookById(bookId);
-        BookDTO bookDTO = BookMapper.toDto(bookEntity);
+        BookDto bookDto = BookMapper.toDto(bookEntity);
         return ResponseGetBook.builder()
-                .bookDTO(bookDTO)
+                .bookDto(bookDto)
                 .build();
     }
 
@@ -62,19 +62,19 @@ public class BookService {
         Pageable pageable = PageRequest.of(requestGetAllBooks.getPage(), requestGetAllBooks.getSize());
         Page<BookEntity> bookPage = bookRepository.findAll(pageable);
 
-        List<BookDTO> bookDTOList = BookMapper.toDtoList(bookPage.getContent());
+        List<BookDto> bookDtoList = BookMapper.toDtoList(bookPage.getContent());
 
         return ResponseGetBooks.builder()
-                .bookDTOList(bookDTOList)
+                .bookDtoList(bookDtoList)
                 .totalElements(bookPage.getTotalElements())
                 .totalPages(bookPage.getTotalPages())
                 .isLast(bookPage.isLast())
                 .build();
     }
 
-    public BookEntity findBookById(Long id) {
+    public BookEntity findBookById(Long id) throws AppException {
         return bookRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Book with id " + id + " not found"));
+                .orElseThrow(() -> new AppException(BookErrorCode.BOOK_NOT_FOUND));
     }
 
     public BookEntity getOrCreateBook(String bookTitle) {

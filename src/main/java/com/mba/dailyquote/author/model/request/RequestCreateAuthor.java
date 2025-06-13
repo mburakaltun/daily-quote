@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RequestCreateAuthor {
-    @NotBlank(message = "Name is required")
+    @NotBlank(message = "{validation.author.name.notBlank}")
     private String name;
 }

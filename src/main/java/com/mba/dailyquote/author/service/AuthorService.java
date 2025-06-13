@@ -1,7 +1,8 @@
 package com.mba.dailyquote.author.service;
 
-import com.mba.dailyquote.author.model.dto.AuthorDTO;
+import com.mba.dailyquote.author.model.dto.AuthorDto;
 import com.mba.dailyquote.author.model.entity.AuthorEntity;
+import com.mba.dailyquote.author.model.enums.AuthorErrorCode;
 import com.mba.dailyquote.author.model.request.RequestCreateAuthor;
 import com.mba.dailyquote.author.model.request.RequestGetAllAuthors;
 import com.mba.dailyquote.author.model.request.RequestUpdateAuthor;
@@ -11,7 +12,7 @@ import com.mba.dailyquote.author.model.response.ResponseGetAuthor;
 import com.mba.dailyquote.author.model.response.ResponseUpdateAuthor;
 import com.mba.dailyquote.author.repository.AuthorRepository;
 import com.mba.dailyquote.author.utility.AuthorMapper;
-import jakarta.persistence.EntityNotFoundException;
+import com.mba.dailyquote.common.exception.AppException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -36,7 +37,7 @@ public class AuthorService {
                 .build();
     }
 
-    public ResponseUpdateAuthor updateAuthor(RequestUpdateAuthor requestUpdateAuthor, Long authorId) {
+    public ResponseUpdateAuthor updateAuthor(RequestUpdateAuthor requestUpdateAuthor, Long authorId) throws AppException {
         AuthorEntity authorEntity = findAuthorById(authorId);
 
         authorEntity.setName(requestUpdateAuthor.getName());
@@ -46,17 +47,17 @@ public class AuthorService {
                 .build();
     }
 
-    public void deleteAuthor(Long authorId) {
+    public void deleteAuthor(Long authorId) throws AppException {
         AuthorEntity authorEntity = findAuthorById(authorId);
         authorRepository.delete(authorEntity);
     }
 
-    public ResponseGetAuthor getAuthorById(Long authorId) {
+    public ResponseGetAuthor getAuthorById(Long authorId) throws AppException {
         AuthorEntity authorEntity = findAuthorById(authorId);
-        AuthorDTO authorDTO = AuthorMapper.toDto(authorEntity);
+        AuthorDto authorDto = AuthorMapper.toDto(authorEntity);
 
         return ResponseGetAuthor.builder()
-                .authorDTO(authorDTO)
+                .authorDto(authorDto)
                 .build();
     }
 
@@ -64,19 +65,19 @@ public class AuthorService {
         Pageable pageable = PageRequest.of(requestGetAllAuthors.getPage(), requestGetAllAuthors.getSize());
         Page<AuthorEntity> authorPage = authorRepository.findAll(pageable);
 
-        List<AuthorDTO> authorDTOList = AuthorMapper.toDtoList(authorPage.getContent());
+        List<AuthorDto> authorDtoList = AuthorMapper.toDtoList(authorPage.getContent());
 
         return ResponseGetAllAuthors.builder()
-                .authorDTOList(authorDTOList)
+                .authorDtoList(authorDtoList)
                 .totalElements(authorPage.getTotalElements())
                 .totalPages(authorPage.getTotalPages())
                 .isLast(authorPage.isLast())
                 .build();
     }
 
-    public AuthorEntity findAuthorById(Long id) {
+    public AuthorEntity findAuthorById(Long id) throws AppException {
         return authorRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Author with id %d not found", id)));
+                .orElseThrow(() -> new AppException(AuthorErrorCode.AUTHOR_NOT_FOUND));
     }
 
     public AuthorEntity getOrCreateAuthor(String authorName) {

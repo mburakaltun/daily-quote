@@ -9,6 +9,7 @@ import com.mba.dailyquote.author.model.response.ResponseGetAuthor;
 import com.mba.dailyquote.author.model.response.ResponseUpdateAuthor;
 import com.mba.dailyquote.author.service.AuthorService;
 import com.mba.dailyquote.common.controller.BaseController;
+import com.mba.dailyquote.common.exception.AppException;
 import com.mba.dailyquote.common.model.response.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -38,19 +39,19 @@ public class AuthorController extends BaseController {
     }
 
     @PutMapping("/{authorId}")
-    public ResponseEntity<ApiResponse<ResponseUpdateAuthor>> updateAuthor(@PathVariable("authorId") Long authorId, @Valid @RequestBody RequestUpdateAuthor requestUpdateAuthor) {
+    public ResponseEntity<ApiResponse<ResponseUpdateAuthor>> updateAuthor(@PathVariable("authorId") Long authorId, @Valid @RequestBody RequestUpdateAuthor requestUpdateAuthor) throws AppException {
         ResponseUpdateAuthor response = authorService.updateAuthor(requestUpdateAuthor, authorId);
         return new ResponseEntity<>(respond(response), HttpStatus.OK);
     }
 
     @DeleteMapping("/{authorId}")
-    public ResponseEntity<ApiResponse<Void>> deleteAuthor(@PathVariable("authorId") Long authorId) {
+    public ResponseEntity<ApiResponse<Void>> deleteAuthor(@PathVariable("authorId") Long authorId) throws AppException {
         authorService.deleteAuthor(authorId);
         return new ResponseEntity<>(respond(), HttpStatus.OK);
     }
 
     @GetMapping("/{authorId}")
-    public ResponseEntity<ApiResponse<ResponseGetAuthor>> getAuthorById(@PathVariable("authorId") Long authorId) {
+    public ResponseEntity<ApiResponse<ResponseGetAuthor>> getAuthorById(@PathVariable("authorId") Long authorId) throws AppException {
         ResponseGetAuthor response = authorService.getAuthorById(authorId);
         return new ResponseEntity<>(respond(response), HttpStatus.OK);
     }

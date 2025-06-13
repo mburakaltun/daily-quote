@@ -1,6 +1,6 @@
 package com.mba.dailyquote.book.model.response;
 
-import com.mba.dailyquote.book.model.dto.BookDTO;
+import com.mba.dailyquote.book.model.dto.BookDto;
 import com.mba.dailyquote.common.model.response.PageableResponse;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -12,6 +12,6 @@ import java.util.List;
 @Data
 @SuperBuilder
 public class ResponseGetBooks extends PageableResponse {
-    private List<BookDTO> bookDTOList;
+    private List<BookDto> bookDtoList;
 }
 

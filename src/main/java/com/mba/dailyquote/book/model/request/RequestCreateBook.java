@@ -1,5 +1,6 @@
 package com.mba.dailyquote.book.model.request;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,6 +12,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RequestCreateBook {
-    @NotNull(message = "Title cannot be null")
+    @NotBlank(message = "{validation.book.title.notBlank}")
     private String title;
 }

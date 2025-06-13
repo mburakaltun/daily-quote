@@ -1,4 +1,4 @@
-package com.mba.dailyquote.book.model.dto;
+package com.mba.dailyquote.quoteType.model.dto;
 
 import lombok.Builder;
 import lombok.Data;
@@ -7,9 +7,9 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class BookDTO {
-    private Long id;
+public class QuoteTypeDto {
+    public Long id;
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
-    private String title;
+    public String name;
 }
