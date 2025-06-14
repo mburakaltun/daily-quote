@@ -18,6 +18,10 @@ public class RequestSignUpUser {
     @Email(message = "{validation.email.invalid}")
     private String email;
 
+    @NotBlank(message = "{validation.username.notBlank}")
+    @Size(min = 3, max = 31, message = "{validation.username.size}")
+    private String username;
+
     @NotBlank(message = "{validation.password.notBlank}")
     @Size(min = 8, message = "{validation.password.size}")
     private String password;

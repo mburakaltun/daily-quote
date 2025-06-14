@@ -30,15 +30,18 @@ public class AuthenticationService {
 
     public ResponseSignUpUser signUpUser(RequestSignUpUser requestSignUpUser) throws AppException {
         String email = requestSignUpUser.getEmail();
+        String username = requestSignUpUser.getUsername();
         String password = requestSignUpUser.getPassword();
 
         validateEmail(email);
+        validateUsername(username);
         validatePasswordMatch(requestSignUpUser);
 
         String encodedPassword = passwordEncoder.encode(password);
 
         UserEntity userEntity = new UserEntity();
         userEntity.setEmail(email);
+        userEntity.setUsername(username);
         userEntity.setEncodedPassword(encodedPassword);
         userEntity.setRole(AuthorizationRole.ROLE_STANDARD_USER);
         userRepository.save(userEntity);
@@ -80,6 +83,13 @@ public class AuthenticationService {
         boolean isEmailExist = userRepository.existsByEmail(email);
         if (isEmailExist) {
             throw new AppException(AuthenticationErrorCode.EMAIL_ALREADY_EXISTS);
+        }
+    }
+
+    private void validateUsername(String username) throws AppException {
+        boolean isUsernameExist = userRepository.existsByUsername(username);
+        if (isUsernameExist) {
+            throw new AppException(AuthenticationErrorCode.USERNAME_ALREADY_EXISTS);
         }
     }
 
