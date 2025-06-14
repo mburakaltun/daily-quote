@@ -1,12 +1,11 @@
 package com.mba.dailyquote.common.exception;
 
 import com.mba.dailyquote.common.model.response.ApiExceptionResponse;
-import com.mba.dailyquote.common.model.response.ApiResponse;
 import com.mba.dailyquote.common.util.ResponseUtility;
-import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
+import org.springframework.context.NoSuchMessageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authorization.AuthorizationDeniedException;
@@ -82,6 +81,11 @@ public class GlobalExceptionHandler {
     }
 
     public String getLocalizedMessage(String messageKey, Locale locale) {
-        return messageSource.getMessage(messageKey, null, locale);
+        try {
+            return messageSource.getMessage(messageKey, null, locale);
+        } catch (NoSuchMessageException e) {
+            log.warn("No message found for key: {}", messageKey, e);
+            return messageSource.getMessage(SYSTEM_ERROR_MESSAGE_KEY, null, locale);
+        }
     }
 }

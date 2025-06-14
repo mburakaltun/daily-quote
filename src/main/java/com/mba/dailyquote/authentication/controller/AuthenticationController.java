@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/authentication")
+@RequestMapping("/api/v1/authentication")
 public class AuthenticationController extends BaseController {
 
     private final AuthenticationService authenticationService;

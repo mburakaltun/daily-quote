@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/quote-categories")
+@RequestMapping("/api/v1/quote-categories")
 public class QuoteCategoryController extends BaseController {
 
     private final QuoteCategoryService quoteCategoryService;

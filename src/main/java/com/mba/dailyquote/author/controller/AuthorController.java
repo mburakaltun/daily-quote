@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/authors")
+@RequestMapping("/api/v1/authors")
 public class AuthorController extends BaseController {
 
     private final AuthorService authorService;

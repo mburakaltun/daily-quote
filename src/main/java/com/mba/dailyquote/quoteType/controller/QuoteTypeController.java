@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/quote-types")
+@RequestMapping("/api/v1/quote-types")
 public class QuoteTypeController extends BaseController {
 
     private final QuoteTypeService quoteTypeService;
