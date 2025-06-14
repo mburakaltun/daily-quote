@@ -40,8 +40,7 @@ public class QuoteController extends BaseController {
 
     @PutMapping("/{quoteId}")
     public ResponseEntity<ApiResponse<ResponseUpdateQuote>> updateQuote(@PathVariable("quoteId") Long quoteId, @Valid @RequestBody RequestUpdateQuote requestUpdateQuote) throws AppException {
-        requestUpdateQuote.setId(quoteId);
-        ResponseUpdateQuote response = quoteService.updateQuote(requestUpdateQuote);
+        ResponseUpdateQuote response = quoteService.updateQuote(requestUpdateQuote, quoteId);
         return new ResponseEntity<>(respond(response), HttpStatus.OK);
     }
 

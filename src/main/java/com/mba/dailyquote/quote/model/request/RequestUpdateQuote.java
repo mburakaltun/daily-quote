@@ -1,5 +1,6 @@
 package com.mba.dailyquote.quote.model.request;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
@@ -8,15 +9,16 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RequestUpdateQuote {
-    private Long id;
-
-    @Size(min = 5, max = 255, message = "Quote must be between 5 and 255 characters")
+    @NotBlank(message = "{validation.quote.content.notBlank}")
+    @Size(min = 5, max = 255, message = "{validation.quote.content.size}")
     private String content;
 
-    @Size(min = 5, max = 255, message = "Turkish Translation of Quote must be between 5 and 255 characters")
+    @NotBlank(message = "{validation.quote.contentTr.notBlank}")
+    @Size(min = 5, max = 255, message = "{validation.quote.contentTr.size}")
     private String contentTr;
 
-    @Size(max = 255, message = "Note must be less than 255 characters")
+    @NotBlank(message = "{validation.quote.note.notBlank}")
+    @Size(min = 3, max = 255, message = "{validation.quote.note.size}")
     private String note;
 
     private boolean isActive;

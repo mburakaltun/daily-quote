@@ -91,9 +91,8 @@ public class QuoteService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public ResponseUpdateQuote updateQuote(RequestUpdateQuote requestUpdateQuote) throws AppException {
-        Long id = requestUpdateQuote.getId();
-        QuoteEntity quoteEntity = findQuoteById(id);
+    public ResponseUpdateQuote updateQuote(RequestUpdateQuote requestUpdateQuote, Long quoteId) throws AppException {
+        QuoteEntity quoteEntity = findQuoteById(quoteId);
 
         quoteEntity.setContent(requestUpdateQuote.getContent());
         quoteEntity.setContentTr(requestUpdateQuote.getContentTr());

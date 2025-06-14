@@ -1,5 +1,6 @@
 package com.mba.dailyquote.quoteCategory.model.request;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,8 +12,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RequestUpdateQuoteCategory {
-    private Long id;
-
-    @NotNull(message = "Name cannot be null")
+    @NotBlank(message = "{validation.quoteCategory.name.notBlank}")
     private String name;
 }

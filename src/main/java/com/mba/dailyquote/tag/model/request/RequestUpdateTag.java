@@ -11,8 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RequestUpdateTag {
-    private Long id;
-
-    @NotBlank(message = "Name is required")
+    @NotBlank(message = "{validation.tag.name.notBlank}")
     private String name;
 }

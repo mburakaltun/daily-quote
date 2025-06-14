@@ -1,5 +1,6 @@
 package com.mba.dailyquote.quoteType.model.request;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,5 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RequestCreateQuoteType {
+    @NotBlank(message = "{validation.quoteType.name.notBlank}")
     private String name;
 }
