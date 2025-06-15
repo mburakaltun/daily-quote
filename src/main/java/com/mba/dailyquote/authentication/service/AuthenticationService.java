@@ -55,13 +55,15 @@ public class AuthenticationService {
         String email = requestSignInUser.getEmail();
         String password = requestSignInUser.getPassword();
 
-        validateUserCredentials(email, password);
+        UserEntity userEntity = validateUserCredentials(email, password);
         Authentication authentication = authenticateUser(email, password);
 
         AuthorizationRole role = generateRole(authentication);
         String authenticationToken = JwtUtility.generateToken(email, role);
 
         return ResponseSignInUser.builder()
+                .userId(String.valueOf(userEntity.getId()))
+                .username(userEntity.getUsername())
                 .authenticationToken(authenticationToken)
                 .build();
     }
@@ -93,7 +95,7 @@ public class AuthenticationService {
         }
     }
 
-    private void validateUserCredentials(String email, String password) throws AppException {
+    private UserEntity validateUserCredentials(String email, String password) throws AppException {
         UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new AppException(AuthenticationErrorCode.INVALID_CREDENTIALS));
 
         String encodedPassword = userEntity.getEncodedPassword();
@@ -101,6 +103,7 @@ public class AuthenticationService {
         if (!isPasswordCorrect) {
             throw new AppException(AuthenticationErrorCode.INVALID_CREDENTIALS);
         }
+        return userEntity;
     }
 
     private void validatePasswordMatch(RequestSignUpUser requestSignUpUser) throws AppException {
