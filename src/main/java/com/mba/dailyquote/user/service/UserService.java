@@ -1,7 +1,7 @@
 package com.mba.dailyquote.user.service;
 
 import com.mba.dailyquote.authentication.model.entity.UserEntity;
-import com.mba.dailyquote.authentication.repository.UserRepository;
+import com.mba.dailyquote.authentication.repository.UserJpaRepository;
 import com.mba.dailyquote.common.exception.AppException;
 import com.mba.dailyquote.common.model.enums.Status;
 import com.mba.dailyquote.user.model.enums.UserErrorCode;
@@ -23,17 +23,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final BCryptPasswordEncoder passwordEncoder;
-    private final UserRepository userRepository;
+    private final UserJpaRepository userJpaRepository;
 
     @Transactional
     public ResponseChangeUsername changeUsername(RequestChangeUsername request, String userId) throws AppException {
-        UserEntity userEntity = userRepository.findById(Long.valueOf(userId)).orElseThrow(() -> new AppException(UserErrorCode.USER_NOT_FOUND));
+        UserEntity userEntity = userJpaRepository.findById(Long.valueOf(userId)).orElseThrow(() -> new AppException(UserErrorCode.USER_NOT_FOUND));
 
         String newUsername = request.getNewUsername();
         validateUsername(newUsername, userEntity.getId());
 
         userEntity.setUsername(newUsername);
-        userRepository.save(userEntity);
+        userJpaRepository.save(userEntity);
 
         return ResponseChangeUsername.builder()
                 .id(userEntity.getId())
@@ -42,7 +42,7 @@ public class UserService {
     }
 
     public ResponseGetProfile getProfile(String userId) throws AppException {
-        UserEntity userEntity = userRepository.findById(Long.valueOf(userId)).orElseThrow(() -> new AppException(UserErrorCode.USER_NOT_FOUND));
+        UserEntity userEntity = userJpaRepository.findById(Long.valueOf(userId)).orElseThrow(() -> new AppException(UserErrorCode.USER_NOT_FOUND));
 
         return ResponseGetProfile.builder()
                 .username(userEntity.getUsername())
@@ -55,7 +55,7 @@ public class UserService {
             throw new AppException(UserErrorCode.PASSWORD_MISMATCH);
         }
 
-        UserEntity userEntity = userRepository.findById(Long.valueOf(userId)).orElseThrow(() -> new AppException(UserErrorCode.USER_NOT_FOUND));
+        UserEntity userEntity = userJpaRepository.findById(Long.valueOf(userId)).orElseThrow(() -> new AppException(UserErrorCode.USER_NOT_FOUND));
         boolean isPasswordCorrect = passwordEncoder.matches(requestChangePassword.getCurrentPassword(), userEntity.getEncodedPassword());
 
         if (!isPasswordCorrect) {
@@ -63,7 +63,7 @@ public class UserService {
         }
 
         userEntity.setEncodedPassword(passwordEncoder.encode(requestChangePassword.getNewPassword()));
-        userRepository.save(userEntity);
+        userJpaRepository.save(userEntity);
 
         return ResponseChangePassword.builder()
                 .userId(userEntity.getId())
@@ -72,10 +72,10 @@ public class UserService {
 
     @Transactional
     public ResponseDeleteUser deleteUser(String userId) throws AppException {
-        UserEntity userEntity = userRepository.findById(Long.valueOf(userId)).orElseThrow(() -> new AppException(UserErrorCode.USER_NOT_FOUND));
+        UserEntity userEntity = userJpaRepository.findById(Long.valueOf(userId)).orElseThrow(() -> new AppException(UserErrorCode.USER_NOT_FOUND));
 
         userEntity.setStatus(Status.DELETED);
-        userRepository.save(userEntity);
+        userJpaRepository.save(userEntity);
 
         return ResponseDeleteUser.builder()
                 .userId(Long.valueOf(userId))
@@ -83,7 +83,7 @@ public class UserService {
     }
 
     private void validateUsername(String username, Long currentUserId) throws AppException {
-        boolean usernameExists = userRepository.findByUsername(username)
+        boolean usernameExists = userJpaRepository.findByUsername(username)
                 .map(user -> !user.getId().equals(currentUserId))
                 .orElse(false);
 

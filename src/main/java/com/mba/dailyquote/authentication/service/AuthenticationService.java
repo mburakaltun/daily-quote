@@ -1,17 +1,28 @@
 package com.mba.dailyquote.authentication.service;
 
+import com.mba.dailyquote.authentication.model.entity.PasswordResetTokenEntity;
 import com.mba.dailyquote.authentication.model.entity.UserEntity;
 import com.mba.dailyquote.authentication.model.enums.AuthenticationErrorCode;
+import com.mba.dailyquote.authentication.model.request.RequestCompleteForgotPassword;
 import com.mba.dailyquote.authentication.model.request.RequestSignInUser;
 import com.mba.dailyquote.authentication.model.request.RequestSignUpUser;
+import com.mba.dailyquote.authentication.model.request.RequestStartForgotPassword;
+import com.mba.dailyquote.authentication.model.response.ResponseCompleteForgotPassword;
 import com.mba.dailyquote.authentication.model.response.ResponseSignInUser;
 import com.mba.dailyquote.authentication.model.response.ResponseSignUpUser;
-import com.mba.dailyquote.authentication.repository.UserRepository;
+import com.mba.dailyquote.authentication.model.response.ResponseStartForgotPassword;
+import com.mba.dailyquote.authentication.properties.AuthenticationProperties;
+import com.mba.dailyquote.authentication.repository.PasswordResetTokenJpaRepository;
+import com.mba.dailyquote.authentication.repository.UserJpaRepository;
 import com.mba.dailyquote.authorization.model.enums.AuthorizationRole;
 import com.mba.dailyquote.common.exception.AppException;
 import com.mba.dailyquote.common.util.JwtUtility;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -19,14 +30,25 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.UUID;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class AuthenticationService {
 
     private final BCryptPasswordEncoder passwordEncoder;
-    private final UserRepository userRepository;
+    private final UserJpaRepository userJpaRepository;
     private final AuthenticationManager authenticationManager;
+    private final JavaMailSender javaMailSender;
+    private final PasswordResetTokenJpaRepository passwordResetTokenJpaRepository;
+    private final MessageSource messageSource;
+    private final AuthenticationProperties authenticationProperties;
+
+    private static final long TOKEN_EXPIRY_MINUTES = 15L;
 
     public ResponseSignUpUser signUpUser(RequestSignUpUser requestSignUpUser) throws AppException {
         String email = requestSignUpUser.getEmail();
@@ -44,7 +66,7 @@ public class AuthenticationService {
         userEntity.setUsername(username);
         userEntity.setEncodedPassword(encodedPassword);
         userEntity.setRole(AuthorizationRole.ROLE_STANDARD_USER);
-        userRepository.save(userEntity);
+        userJpaRepository.save(userEntity);
 
         return ResponseSignUpUser.builder()
                 .id(userEntity.getId())
@@ -68,6 +90,86 @@ public class AuthenticationService {
                 .build();
     }
 
+    public ResponseStartForgotPassword startForgotPassword(RequestStartForgotPassword request) throws AppException {
+        String email = request.getEmail();
+        Locale locale = LocaleContextHolder.getLocale();
+
+        UserEntity userEntity = userJpaRepository.findByEmail(email).orElseThrow(() -> new AppException(AuthenticationErrorCode.USER_NOT_FOUND));
+
+        String token = UUID.randomUUID().toString();
+
+        createPasswordResetToken(userEntity, token);
+        sendPasswordResetEmail(userEntity, token, locale);
+
+        return ResponseStartForgotPassword.builder()
+                .emailSent(true)
+                .build();
+    }
+
+    public ResponseCompleteForgotPassword completeForgotPassword(RequestCompleteForgotPassword requestCompleteForgotPassword) throws AppException {
+        String token = requestCompleteForgotPassword.getToken();
+        String newPassword = requestCompleteForgotPassword.getNewPassword();
+
+        validatePasswordMatch(requestCompleteForgotPassword);
+
+        PasswordResetTokenEntity passwordResetTokenEntity = validateToken(token);
+        UserEntity userEntity = passwordResetTokenEntity.getUserEntity();
+
+        String encodedPassword = passwordEncoder.encode(newPassword);
+        userEntity.setEncodedPassword(encodedPassword);
+        userJpaRepository.save(userEntity);
+
+        passwordResetTokenJpaRepository.delete(passwordResetTokenEntity);
+
+        return ResponseCompleteForgotPassword.builder()
+                .userId(String.valueOf(userEntity.getId()))
+                .build();
+    }
+
+    private void sendPasswordResetEmail(UserEntity userEntity, String token, Locale locale) {
+        String email = userEntity.getEmail();
+        String subject = messageSource.getMessage("password.reset.subject", null, locale);
+        String message = getMessage(userEntity, token, locale);
+
+        SimpleMailMessage emailMessage = new SimpleMailMessage();
+        emailMessage.setTo(email);
+        emailMessage.setSubject(subject);
+        emailMessage.setText(message);
+        javaMailSender.send(emailMessage);
+    }
+
+    private String getMessage(UserEntity userEntity, String token, Locale locale) {
+        String resetPasswordDeepLinkUrl = String.format("%s?token=%s", authenticationProperties.getResetPasswordDeepLinkUrl(), token);
+
+        return String.format("%s\n\n%s\n%s\n\n%s\n\n%s",
+                messageSource.getMessage("password.reset.greeting", new Object[]{userEntity.getUsername()}, locale),
+                messageSource.getMessage("password.reset.instruction", null, locale),
+                messageSource.getMessage("password.reset.link", new Object[]{resetPasswordDeepLinkUrl}, locale),
+                messageSource.getMessage("password.reset.ignore", null, locale),
+                messageSource.getMessage("password.reset.signature", null, locale)
+        );
+    }
+
+    private void createPasswordResetToken(UserEntity userEntity, String token) {
+        Optional<PasswordResetTokenEntity> passwordResetTokenEntityOptional = passwordResetTokenJpaRepository.findByUserEntity_Id(userEntity.getId());
+        PasswordResetTokenEntity passwordResetTokenEntity = passwordResetTokenEntityOptional.orElseGet(PasswordResetTokenEntity::new);
+        passwordResetTokenEntity.setToken(token);
+        passwordResetTokenEntity.setUserEntity(userEntity);
+        passwordResetTokenEntity.setExpiryDate(LocalDateTime.now().plusMinutes(TOKEN_EXPIRY_MINUTES));
+        passwordResetTokenJpaRepository.save(passwordResetTokenEntity);
+    }
+
+    private PasswordResetTokenEntity validateToken(String token) throws AppException {
+        PasswordResetTokenEntity passwordResetTokenEntity = passwordResetTokenJpaRepository
+                .findByToken(token)
+                .orElseThrow(() -> new AppException(AuthenticationErrorCode.TOKEN_NOT_FOUND));
+
+        if (passwordResetTokenEntity.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new AppException(AuthenticationErrorCode.TOKEN_EXPIRED);
+        }
+        return passwordResetTokenEntity;
+    }
+
     private AuthorizationRole generateRole(Authentication authentication) {
         String role = authentication.getAuthorities().stream().findFirst().get().getAuthority();
         return AuthorizationRole.valueOf(role);
@@ -82,21 +184,21 @@ public class AuthenticationService {
     }
 
     private void validateEmail(String email) throws AppException {
-        boolean isEmailExist = userRepository.existsByEmail(email);
+        boolean isEmailExist = userJpaRepository.existsByEmail(email);
         if (isEmailExist) {
             throw new AppException(AuthenticationErrorCode.EMAIL_ALREADY_EXISTS);
         }
     }
 
     private void validateUsername(String username) throws AppException {
-        boolean isUsernameExist = userRepository.existsByUsername(username);
+        boolean isUsernameExist = userJpaRepository.existsByUsername(username);
         if (isUsernameExist) {
             throw new AppException(AuthenticationErrorCode.USERNAME_ALREADY_EXISTS);
         }
     }
 
     private UserEntity validateUserCredentials(String email, String password) throws AppException {
-        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new AppException(AuthenticationErrorCode.INVALID_CREDENTIALS));
+        UserEntity userEntity = userJpaRepository.findByEmail(email).orElseThrow(() -> new AppException(AuthenticationErrorCode.INVALID_CREDENTIALS));
 
         String encodedPassword = userEntity.getEncodedPassword();
         boolean isPasswordCorrect = passwordEncoder.matches(password, encodedPassword);
@@ -110,6 +212,14 @@ public class AuthenticationService {
         String password = requestSignUpUser.getPassword();
         String confirmPassword = requestSignUpUser.getConfirmPassword();
         if (!password.equals(confirmPassword)) {
+            throw new AppException(AuthenticationErrorCode.PASSWORD_MISMATCH);
+        }
+    }
+
+    private void validatePasswordMatch(RequestCompleteForgotPassword requestCompleteForgotPassword) throws AppException {
+        String newPassword = requestCompleteForgotPassword.getNewPassword();
+        String confirmNewPassword = requestCompleteForgotPassword.getConfirmNewPassword();
+        if (!newPassword.equals(confirmNewPassword)) {
             throw new AppException(AuthenticationErrorCode.PASSWORD_MISMATCH);
         }
     }

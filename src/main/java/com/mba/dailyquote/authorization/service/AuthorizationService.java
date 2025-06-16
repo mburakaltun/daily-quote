@@ -3,7 +3,7 @@ package com.mba.dailyquote.authorization.service;
 import com.mba.dailyquote.authentication.model.entity.UserEntity;
 import com.mba.dailyquote.authentication.model.enums.AuthenticationErrorCode;
 import com.mba.dailyquote.authorization.model.enums.AuthorizationRole;
-import com.mba.dailyquote.authentication.repository.UserRepository;
+import com.mba.dailyquote.authentication.repository.UserJpaRepository;
 import com.mba.dailyquote.authorization.model.request.AssignRolesRequest;
 import com.mba.dailyquote.authorization.model.response.AssignRolesResponse;
 import com.mba.dailyquote.common.exception.AppException;
@@ -15,18 +15,18 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Service
 public class AuthorizationService {
-    private final UserRepository userRepository;
+    private final UserJpaRepository userJpaRepository;
 
     public AssignRolesResponse assignRoles(AssignRolesRequest assignRolesRequest) throws AppException {
         Long userId = assignRolesRequest.getUserId();
         AuthorizationRole role = assignRolesRequest.getRole();
 
-        UserEntity userEntity = userRepository.findById(userId)
+        UserEntity userEntity = userJpaRepository.findById(userId)
                 .orElseThrow(() -> new AppException(AuthenticationErrorCode.USER_NOT_FOUND));
 
 
         userEntity.setRole(role);
-        userRepository.save(userEntity);
+        userJpaRepository.save(userEntity);
 
         return AssignRolesResponse.builder()
                 .status(Boolean.TRUE)

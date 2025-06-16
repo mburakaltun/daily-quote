@@ -22,6 +22,17 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 logging:
   level:
@@ -44,6 +55,8 @@ authentication:
   whitelisted-endpoints:
     - /api/v1/authentication/sign-up
     - /api/v1/authentication/sign-in
+    - /authentication/start-forgot-password
+    - /authentication/complete-forgot-password
 
 management:
   endpoints:
