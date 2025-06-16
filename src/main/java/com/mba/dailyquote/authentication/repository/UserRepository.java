@@ -1,5 +1,6 @@
 package com.mba.dailyquote.authentication.repository;
 
+import aj.org.objectweb.asm.commons.Remapper;
 import com.mba.dailyquote.authentication.model.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -11,4 +12,6 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     Optional<UserEntity> findByEmail(String email);
 
     boolean existsByUsername(String username);
+
+    Optional<UserEntity> findByUsername(String username);
 }
