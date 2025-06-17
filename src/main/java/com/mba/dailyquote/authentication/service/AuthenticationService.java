@@ -3,14 +3,14 @@ package com.mba.dailyquote.authentication.service;
 import com.mba.dailyquote.authentication.model.entity.PasswordResetTokenEntity;
 import com.mba.dailyquote.authentication.model.entity.UserEntity;
 import com.mba.dailyquote.authentication.model.enums.AuthenticationErrorCode;
-import com.mba.dailyquote.authentication.model.request.RequestCompleteForgotPassword;
+import com.mba.dailyquote.authentication.model.request.RequestCompleteResetPassword;
 import com.mba.dailyquote.authentication.model.request.RequestSignInUser;
 import com.mba.dailyquote.authentication.model.request.RequestSignUpUser;
-import com.mba.dailyquote.authentication.model.request.RequestStartForgotPassword;
-import com.mba.dailyquote.authentication.model.response.ResponseCompleteForgotPassword;
+import com.mba.dailyquote.authentication.model.request.RequestStartResetPassword;
+import com.mba.dailyquote.authentication.model.response.ResponseCompleteResetPassword;
 import com.mba.dailyquote.authentication.model.response.ResponseSignInUser;
 import com.mba.dailyquote.authentication.model.response.ResponseSignUpUser;
-import com.mba.dailyquote.authentication.model.response.ResponseStartForgotPassword;
+import com.mba.dailyquote.authentication.model.response.ResponseStartResetPassword;
 import com.mba.dailyquote.authentication.properties.AuthenticationProperties;
 import com.mba.dailyquote.authentication.repository.PasswordResetTokenJpaRepository;
 import com.mba.dailyquote.authentication.repository.UserJpaRepository;
@@ -90,7 +90,7 @@ public class AuthenticationService {
                 .build();
     }
 
-    public ResponseStartForgotPassword startForgotPassword(RequestStartForgotPassword request) throws AppException {
+    public ResponseStartResetPassword startResetPassword(RequestStartResetPassword request) throws AppException {
         String email = request.getEmail();
         Locale locale = LocaleContextHolder.getLocale();
 
@@ -101,16 +101,16 @@ public class AuthenticationService {
         createPasswordResetToken(userEntity, token);
         sendPasswordResetEmail(userEntity, token, locale);
 
-        return ResponseStartForgotPassword.builder()
+        return ResponseStartResetPassword.builder()
                 .emailSent(true)
                 .build();
     }
 
-    public ResponseCompleteForgotPassword completeForgotPassword(RequestCompleteForgotPassword requestCompleteForgotPassword) throws AppException {
-        String token = requestCompleteForgotPassword.getToken();
-        String newPassword = requestCompleteForgotPassword.getNewPassword();
+    public ResponseCompleteResetPassword completeResetPassword(RequestCompleteResetPassword requestCompleteResetPassword) throws AppException {
+        String token = requestCompleteResetPassword.getToken();
+        String newPassword = requestCompleteResetPassword.getNewPassword();
 
-        validatePasswordMatch(requestCompleteForgotPassword);
+        validatePasswordMatch(requestCompleteResetPassword);
 
         PasswordResetTokenEntity passwordResetTokenEntity = validateToken(token);
         UserEntity userEntity = passwordResetTokenEntity.getUserEntity();
@@ -121,7 +121,7 @@ public class AuthenticationService {
 
         passwordResetTokenJpaRepository.delete(passwordResetTokenEntity);
 
-        return ResponseCompleteForgotPassword.builder()
+        return ResponseCompleteResetPassword.builder()
                 .userId(String.valueOf(userEntity.getId()))
                 .build();
     }
@@ -216,9 +216,9 @@ public class AuthenticationService {
         }
     }
 
-    private void validatePasswordMatch(RequestCompleteForgotPassword requestCompleteForgotPassword) throws AppException {
-        String newPassword = requestCompleteForgotPassword.getNewPassword();
-        String confirmNewPassword = requestCompleteForgotPassword.getConfirmNewPassword();
+    private void validatePasswordMatch(RequestCompleteResetPassword requestCompleteResetPassword) throws AppException {
+        String newPassword = requestCompleteResetPassword.getNewPassword();
+        String confirmNewPassword = requestCompleteResetPassword.getConfirmNewPassword();
         if (!newPassword.equals(confirmNewPassword)) {
             throw new AppException(AuthenticationErrorCode.PASSWORD_MISMATCH);
         }

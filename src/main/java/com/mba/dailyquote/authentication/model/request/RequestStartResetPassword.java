@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class RequestStartForgotPassword {
+public class RequestStartResetPassword {
     @Email(message = "{validation.email.invalid}")
     @NotBlank(message = "{validation.email.notBlank}")
     private String email;

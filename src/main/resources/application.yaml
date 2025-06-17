@@ -55,8 +55,8 @@ authentication:
   whitelisted-endpoints:
     - /api/v1/authentication/sign-up
     - /api/v1/authentication/sign-in
-    - /authentication/start-forgot-password
-    - /authentication/complete-forgot-password
+    - /api/v1/authentication/start-reset-password
+    - /api/v1/authentication/complete-reset-password
 
 management:
   endpoints:

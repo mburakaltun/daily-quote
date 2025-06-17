@@ -5,6 +5,6 @@ import lombok.Data;
 
 @Data
 @Builder
-public class ResponseCompleteForgotPassword {
-    private String userId;
+public class ResponseStartResetPassword {
+    boolean emailSent;
 }

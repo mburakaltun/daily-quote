@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class RequestCompleteForgotPassword {
+public class RequestCompleteResetPassword {
     @NotBlank(message = "{validation.token.notBlank}")
     private String token;
 
