@@ -41,7 +41,7 @@ public class BookController extends BaseController {
     @PutMapping("/{bookId}")
     public ResponseEntity<ApiResponse<ResponseUpdateBook>> updateBook(@PathVariable("bookId") Long bookId, @Valid @RequestBody RequestUpdateBook requestUpdateBook) throws AppException {
         ResponseUpdateBook response = bookService.updateBook(requestUpdateBook, bookId);
-        return new ResponseEntity<>(respond(response), HttpStatus.OK);
+        return ResponseEntity.ok(respond(response));
     }
 
     @DeleteMapping("/{bookId}")
@@ -53,12 +53,12 @@ public class BookController extends BaseController {
     @GetMapping("/{bookId}")
     public ResponseEntity<ApiResponse<ResponseGetBook>> getBookById(@PathVariable("bookId") Long bookId) throws AppException {
         ResponseGetBook response = bookService.getBookById(bookId);
-        return new ResponseEntity<>(respond(response), HttpStatus.OK);
+        return ResponseEntity.ok(respond(response));
     }
 
     @GetMapping
     public ResponseEntity<ApiResponse<ResponseGetBooks>> getAllBooks(@Valid @ModelAttribute RequestGetAllBooks requestGetAllBooks) {
         ResponseGetBooks response = bookService.getAllBooks(requestGetAllBooks);
-        return new ResponseEntity<>(respond(response), HttpStatus.OK);
+        return ResponseEntity.ok(respond(response));
     }
 }

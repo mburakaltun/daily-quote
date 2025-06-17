@@ -41,7 +41,7 @@ public class TagController extends BaseController {
     @PutMapping("/{tagId}")
     public ResponseEntity<ApiResponse<ResponseUpdateTag>> updateTag(@PathVariable("tagId") Long tagId, @Valid @RequestBody RequestUpdateTag requestUpdateTag) throws AppException {
         ResponseUpdateTag response = tagService.updateTag(requestUpdateTag, tagId);
-        return new ResponseEntity<>(respond(response), HttpStatus.OK);
+        return ResponseEntity.ok(respond(response));
     }
 
     @DeleteMapping("/{tagId}")
@@ -53,12 +53,12 @@ public class TagController extends BaseController {
     @GetMapping("/{tagId}")
     public ResponseEntity<ApiResponse<ResponseGetTag>> getTagById(@PathVariable("tagId") Long tagId) throws AppException {
         ResponseGetTag response = tagService.getTagById(tagId);
-        return new ResponseEntity<>(respond(response), HttpStatus.OK);
+        return ResponseEntity.ok(respond(response));
     }
 
     @GetMapping
     public ResponseEntity<ApiResponse<ResponseGetAllTags>> getAllTags(@Valid @ModelAttribute RequestGetAllTags requestGetAllTags) {
         ResponseGetAllTags response = tagService.getAllTags(requestGetAllTags);
-        return new ResponseEntity<>(respond(response), HttpStatus.OK);
+        return ResponseEntity.ok(respond(response));
     }
 }

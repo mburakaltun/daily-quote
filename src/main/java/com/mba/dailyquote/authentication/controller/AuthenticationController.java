@@ -37,7 +37,7 @@ public class AuthenticationController extends BaseController {
     @PostMapping("/sign-in")
     public ResponseEntity<ApiResponse<ResponseSignInUser>> signIn(@Valid @RequestBody RequestSignInUser requestSignInUser) throws AppException {
         ResponseSignInUser response = authenticationService.signInUser(requestSignInUser);
-        return new ResponseEntity<>(respond(response), HttpStatus.OK);
+        return ResponseEntity.ok(respond(response));
     }
 
     @PostMapping("/start-reset-password")

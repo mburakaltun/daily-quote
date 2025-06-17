@@ -41,7 +41,7 @@ public class QuoteController extends BaseController {
     @PutMapping("/{quoteId}")
     public ResponseEntity<ApiResponse<ResponseUpdateQuote>> updateQuote(@PathVariable("quoteId") Long quoteId, @Valid @RequestBody RequestUpdateQuote requestUpdateQuote) throws AppException {
         ResponseUpdateQuote response = quoteService.updateQuote(requestUpdateQuote, quoteId);
-        return new ResponseEntity<>(respond(response), HttpStatus.OK);
+        return ResponseEntity.ok(respond(response));
     }
 
     @DeleteMapping("/{quoteId}")
@@ -53,12 +53,12 @@ public class QuoteController extends BaseController {
     @GetMapping("/{quoteId}")
     public ResponseEntity<ApiResponse<ResponseGetQuote>> getQuoteById(@PathVariable("quoteId") Long quoteId) throws AppException {
         ResponseGetQuote response = quoteService.getQuoteById(quoteId);
-        return new ResponseEntity<>(respond(response), HttpStatus.OK);
+        return ResponseEntity.ok(respond(response));
     }
 
     @GetMapping
     public ResponseEntity<ApiResponse<ResponseGetAllQuotes>> getAllQuotes(@Valid @ModelAttribute RequestGetAllQuotes requestGetAllQuotes) {
         ResponseGetAllQuotes response = quoteService.getAllQuotes(requestGetAllQuotes);
-        return new ResponseEntity<>(respond(response), HttpStatus.OK);
+        return ResponseEntity.ok(respond(response));
     }
 }

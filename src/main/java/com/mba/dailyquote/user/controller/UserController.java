@@ -33,26 +33,26 @@ public class UserController extends BaseController {
     @GetMapping("/profile")
     public ResponseEntity<ApiResponse<ResponseGetProfile>> getProfile(@RequestHeader(AppHeaders.X_USER_ID) String userId) throws AppException {
         ResponseGetProfile response = userService.getProfile(userId);
-        return new ResponseEntity<>(respond(response), HttpStatus.OK);
+        return ResponseEntity.ok(respond(response));
     }
 
     @PutMapping("/username")
     public ResponseEntity<ApiResponse<ResponseChangeUsername>> changeUsername(@RequestHeader(AppHeaders.X_USER_ID) String userId,
                                                                               @Valid @RequestBody RequestChangeUsername requestChangeUsername) throws AppException {
         ResponseChangeUsername response = userService.changeUsername(requestChangeUsername, userId);
-        return new ResponseEntity<>(respond(response), HttpStatus.OK);
+        return ResponseEntity.ok(respond(response));
     }
 
     @PutMapping("/password")
     public ResponseEntity<ApiResponse<ResponseChangePassword>> changePassword(@RequestHeader(AppHeaders.X_USER_ID) String userId,
                                                                               @Valid @RequestBody RequestChangePassword requestChangePassword) throws AppException {
         ResponseChangePassword response = userService.changePassword(requestChangePassword, userId);
-        return new ResponseEntity<>(respond(response), HttpStatus.OK);
+        return ResponseEntity.ok(respond(response));
     }
 
     @DeleteMapping
     public ResponseEntity<ApiResponse<ResponseDeleteUser>> deleteUser(@RequestHeader(AppHeaders.X_USER_ID) String userId) throws AppException {
         ResponseDeleteUser response = userService.deleteUser(userId);
-        return new ResponseEntity<>(respond(response), HttpStatus.OK);
+        return ResponseEntity.ok(respond(response));
     }
 }

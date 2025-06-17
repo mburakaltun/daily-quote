@@ -41,7 +41,7 @@ public class AuthorController extends BaseController {
     @PutMapping("/{authorId}")
     public ResponseEntity<ApiResponse<ResponseUpdateAuthor>> updateAuthor(@PathVariable("authorId") Long authorId, @Valid @RequestBody RequestUpdateAuthor requestUpdateAuthor) throws AppException {
         ResponseUpdateAuthor response = authorService.updateAuthor(requestUpdateAuthor, authorId);
-        return new ResponseEntity<>(respond(response), HttpStatus.OK);
+        return ResponseEntity.ok(respond(response));
     }
 
     @DeleteMapping("/{authorId}")
@@ -53,12 +53,12 @@ public class AuthorController extends BaseController {
     @GetMapping("/{authorId}")
     public ResponseEntity<ApiResponse<ResponseGetAuthor>> getAuthorById(@PathVariable("authorId") Long authorId) throws AppException {
         ResponseGetAuthor response = authorService.getAuthorById(authorId);
-        return new ResponseEntity<>(respond(response), HttpStatus.OK);
+        return ResponseEntity.ok(respond(response));
     }
 
     @GetMapping
     public ResponseEntity<ApiResponse<ResponseGetAllAuthors>> getAllAuthors(@Valid @ModelAttribute RequestGetAllAuthors requestGetAllAuthors) {
         ResponseGetAllAuthors response = authorService.getAllAuthors(requestGetAllAuthors);
-        return new ResponseEntity<>(respond(response), HttpStatus.OK);
+        return ResponseEntity.ok(respond(response));
     }
 }

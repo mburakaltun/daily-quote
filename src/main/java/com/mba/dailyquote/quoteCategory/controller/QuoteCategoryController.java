@@ -42,7 +42,7 @@ public class QuoteCategoryController extends BaseController {
     @PutMapping("/{quoteCategoryId}")
     public ResponseEntity<ApiResponse<ResponseUpdateQuoteCategory>> updateQuoteCategory(@PathVariable("quoteCategoryId") Long quoteCategoryId, @Valid @RequestBody RequestUpdateQuoteCategory requestUpdateQuoteCategory) throws AppException {
         ResponseUpdateQuoteCategory response = quoteCategoryService.updateQuoteCategory(requestUpdateQuoteCategory, quoteCategoryId);
-        return new ResponseEntity<>(respond(response), HttpStatus.OK);
+        return ResponseEntity.ok(respond(response));
     }
 
     @DeleteMapping("/{quoteCategoryId}")
@@ -54,12 +54,12 @@ public class QuoteCategoryController extends BaseController {
     @GetMapping("/{quoteCategoryId}")
     public ResponseEntity<ApiResponse<ResponseGetQuoteCategory>> getQuoteCategoryById(@PathVariable("quoteCategoryId") Long quoteCategoryId) throws AppException {
         ResponseGetQuoteCategory response = quoteCategoryService.getQuoteCategoryById(quoteCategoryId);
-        return new ResponseEntity<>(respond(response), HttpStatus.OK);
+        return ResponseEntity.ok(respond(response));
     }
 
     @GetMapping
     public ResponseEntity<ApiResponse<ResponseGetAllQuoteCategories>> getAllQuoteCategories(@Valid @ModelAttribute RequestGetAllQuoteCategories requestGetAllQuoteCategories) {
         ResponseGetAllQuoteCategories response = quoteCategoryService.getAllQuoteCategories(requestGetAllQuoteCategories);
-        return new ResponseEntity<>(respond(response), HttpStatus.OK);
+        return ResponseEntity.ok(respond(response));
     }
 }
