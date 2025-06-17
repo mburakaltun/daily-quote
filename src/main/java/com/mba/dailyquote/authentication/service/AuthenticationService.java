@@ -16,6 +16,7 @@ import com.mba.dailyquote.authentication.repository.PasswordResetTokenJpaReposit
 import com.mba.dailyquote.authentication.repository.UserJpaRepository;
 import com.mba.dailyquote.authorization.model.enums.AuthorizationRole;
 import com.mba.dailyquote.common.exception.AppException;
+import com.mba.dailyquote.common.model.enums.Status;
 import com.mba.dailyquote.common.util.JwtUtility;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -96,7 +98,7 @@ public class AuthenticationService {
 
         UserEntity userEntity = userJpaRepository.findByEmail(email).orElseThrow(() -> new AppException(AuthenticationErrorCode.USER_NOT_FOUND));
 
-        String token = UUID.randomUUID().toString();
+        String token = String.valueOf(UUID.randomUUID());
 
         createPasswordResetToken(userEntity, token);
         sendPasswordResetEmail(userEntity, token, locale);
@@ -119,14 +121,16 @@ public class AuthenticationService {
         userEntity.setEncodedPassword(encodedPassword);
         userJpaRepository.save(userEntity);
 
-        passwordResetTokenJpaRepository.delete(passwordResetTokenEntity);
+        passwordResetTokenEntity.setStatus(Status.DELETED);
+        passwordResetTokenJpaRepository.save(passwordResetTokenEntity);
 
         return ResponseCompleteResetPassword.builder()
                 .userId(String.valueOf(userEntity.getId()))
                 .build();
     }
 
-    private void sendPasswordResetEmail(UserEntity userEntity, String token, Locale locale) {
+    @Async
+    public void sendPasswordResetEmail(UserEntity userEntity, String token, Locale locale) {
         String email = userEntity.getEmail();
         String subject = messageSource.getMessage("password.reset.subject", null, locale);
         String message = getMessage(userEntity, token, locale);

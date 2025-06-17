@@ -1,7 +1,6 @@
 package com.mba.dailyquote.authentication.model.entity;
 
 import com.mba.dailyquote.authorization.model.enums.AuthorizationRole;
-import com.mba.dailyquote.common.model.entity.BaseEntity;
 import com.mba.dailyquote.common.model.entity.BaseStatusEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
