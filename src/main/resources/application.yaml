@@ -63,3 +63,5 @@ management:
     web:
       exposure:
         include: "*"
+jwt:
+  secret-key: ${JWT_SECRET}

@@ -1,8 +1,8 @@
 package com.mba.dailyquote.common.filter;
 
-import com.mba.dailyquote.common.util.JwtUtility;
 import com.mba.dailyquote.authentication.properties.AuthenticationProperties;
 import com.mba.dailyquote.common.model.request.CreateRequestLogRequest;
+import com.mba.dailyquote.common.service.JwtService;
 import com.mba.dailyquote.common.service.RequestLogService;
 import com.mba.dailyquote.common.util.StringUtility;
 import jakarta.servlet.FilterChain;
@@ -35,6 +35,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
     private final AuthenticationProperties authenticationProperties;
     private final RequestLogService requestLogService;
+    private final JwtService jwtService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -50,7 +51,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 log.warn("No JWT token found in request headers");
                 unauthorized = true;
             } else {
-                String username = JwtUtility.extractUsername(token);
+                String username = jwtService.extractUsername(token);
                 if (username == null || !handleAuthentication(wrappedRequest, token, username)) {
                     log.warn("Invalid JWT token or missing username");
                     unauthorized = true;
@@ -108,7 +109,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private boolean handleAuthentication(HttpServletRequest request, String token, String username) {
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            if (JwtUtility.validateToken(token, userDetails.getUsername())) {
+            if (jwtService.validateToken(token, userDetails.getUsername())) {
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

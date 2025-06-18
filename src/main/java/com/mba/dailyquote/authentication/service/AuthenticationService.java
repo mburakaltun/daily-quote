@@ -17,7 +17,7 @@ import com.mba.dailyquote.authentication.repository.UserJpaRepository;
 import com.mba.dailyquote.authorization.model.enums.AuthorizationRole;
 import com.mba.dailyquote.common.exception.AppException;
 import com.mba.dailyquote.common.model.enums.Status;
-import com.mba.dailyquote.common.util.JwtUtility;
+import com.mba.dailyquote.common.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -49,6 +49,7 @@ public class AuthenticationService {
     private final PasswordResetTokenJpaRepository passwordResetTokenJpaRepository;
     private final MessageSource messageSource;
     private final AuthenticationProperties authenticationProperties;
+    private final JwtService jwtService;
 
     private static final long TOKEN_EXPIRY_MINUTES = 15L;
 
@@ -83,7 +84,7 @@ public class AuthenticationService {
         Authentication authentication = authenticateUser(email, password);
 
         AuthorizationRole role = generateRole(authentication);
-        String authenticationToken = JwtUtility.generateToken(email, role);
+        String authenticationToken = jwtService.generateToken(email, role);
 
         return ResponseSignInUser.builder()
                 .userId(String.valueOf(userEntity.getId()))
