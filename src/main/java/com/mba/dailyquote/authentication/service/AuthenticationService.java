@@ -13,7 +13,7 @@ import com.mba.dailyquote.authentication.model.response.ResponseSignUpUser;
 import com.mba.dailyquote.authentication.model.response.ResponseStartResetPassword;
 import com.mba.dailyquote.authentication.properties.AuthenticationProperties;
 import com.mba.dailyquote.authentication.repository.PasswordResetTokenJpaRepository;
-import com.mba.dailyquote.authentication.repository.UserJpaRepository;
+import com.mba.dailyquote.user.repository.UserJpaRepository;
 import com.mba.dailyquote.authorization.model.enums.AuthorizationRole;
 import com.mba.dailyquote.common.exception.AppException;
 import com.mba.dailyquote.common.model.enums.Status;

@@ -1,7 +1,7 @@
 package com.mba.dailyquote.authentication.service;
 
 import com.mba.dailyquote.authentication.model.entity.UserEntity;
-import com.mba.dailyquote.authentication.repository.UserJpaRepository;
+import com.mba.dailyquote.user.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

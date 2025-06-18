@@ -1,4 +1,4 @@
-package com.mba.dailyquote.authentication.repository;
+package com.mba.dailyquote.user.repository;
 
 import com.mba.dailyquote.authentication.model.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

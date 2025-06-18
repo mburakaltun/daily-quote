@@ -1,7 +1,7 @@
 package com.mba.dailyquote.user.service;
 
 import com.mba.dailyquote.authentication.model.entity.UserEntity;
-import com.mba.dailyquote.authentication.repository.UserJpaRepository;
+import com.mba.dailyquote.user.repository.UserJpaRepository;
 import com.mba.dailyquote.common.exception.AppException;
 import com.mba.dailyquote.common.model.enums.Status;
 import com.mba.dailyquote.user.model.enums.UserErrorCode;
